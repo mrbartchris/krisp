@@ -1,0 +1,120 @@
+<!-- Client Side - Front End / Visual -->
+<html>
+<head>
+	<title>IO CHAT</title>
+	<link rel ="stylesheet" href = "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+	<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<style>
+		body{
+			margin-top:30px;
+		}
+
+		#messageArea{
+			display:none;
+		}
+	</style>
+</head>
+
+<body>
+<!-- Creating the main container -->
+	<div class = "container-fluid">
+	
+	<!-- Creaing the username form -->
+		<div id = "userFormArea" class = "row">
+			<div>
+				<form id = "userForm">
+					<div class = "form-group">
+						<label>Enter username</label>
+						<input class = "form-control" id = "username"></textarea>
+						<br />
+						<input type = "submit" class = "btn btn-primary" value = "Login" />
+					</div>
+				</form>
+			</div>
+		</div>
+		
+	<!-- Creating the message text form - set to hidden as defined by the style for this id -->
+		<div id = "messageArea" class = "row">
+			<div>
+				<div class = "well">
+					<h3>Online Users</h3>
+					<ul class = 'list-group' id = "users"></ul>
+				</div>
+			</div>
+			<div>
+				<div class = "chat" id = "chat"></div>
+				<form id = "messageForm">
+					<div class = "form-group">
+						<label>Enter Message</label>
+						<textarea class = "form-control" id = "message"></textarea>
+						<br />
+						<input type = "submit" class = "btn btn-primary" value = "Send Message" />
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		$(function(){
+			var $socket = io.connect(); <!-- main socket.io connect function -->
+			<!-- defining all the variables (selectors) used by jQuery id selection -->
+			var $messageForm = $('#messageForm'); 
+			var $message = $('#message');
+			var $chat = $('#chat');
+			var $messageArea = $('#messageArea');
+			var $userFormArea = $('#userFormArea');
+			var $userForm = $('#userForm');
+			var $users = $('#users');
+			var $username = $('#username');
+
+			<!-- jQuery Event - on submit of messageForm -->
+			$messageForm.submit(function(e){
+				e.preventDefault();
+				<!-- prevents submit button action -->
+				console.log('subimtted');
+				$socket.emit('send message', $message.val());
+				<!-- sends 'send message' to the socket along with the value of the text area-->
+				$message.val('');
+				<!-- resets the value of the text area -->
+			});
+
+			$socket.on('new message', function(data){
+				$chat.append('<div class="well"><strong>' +data.user+ '</strong>: ' +data.msg+ '</div>') ;
+				<!-- appends a new div holding the username as well as the msg sent by that user -->
+			});
+
+			$userForm.submit(function(e){
+			<!-- upon submitting the username -->
+				e.preventDefault();
+				<!-- prevents submit button action -->
+				console.log('subimtted');
+				$socket.emit('new user', $username.val(), function(data){
+				<!-- emits 'new user' to the socket server as well as the value of username and performs the following function -->
+					if(data){
+					<!-- if callback is true -->
+						$userFormArea.hide();
+						$messageArea.show();
+						<!-- hides username entry form and reveals chat form -->
+					}
+				});
+				$username.val('');
+				<!-- resets username value -->
+			});
+
+			$socket.on('get users', function(data){
+			<!-- on 'get users' request perform the following function -->
+				var html = '';
+				<!-- initialise a string html to hold the html code required -->
+				for(i = 0; i < data.length; i++){ <!-- for each user -->
+					html  += '<li class = "list-group-item">' +data[i]+ '</li>';
+					<!-- add a list item containing each username to the html string -->
+				}
+				$users.html(html);
+				<!-- add the html string to div users -->
+			});
+		});
+	</script>
+</body>
+</html>
