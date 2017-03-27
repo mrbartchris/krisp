@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Connect Four</title>
+
+</head>
+<body>
+	<script src =
+	 	"https://cdn.socket.io/socket.io-1.4.5.js"
+	></script>
+	<script>
+
+	var socket = io.connect('/');// io object
+
+	socket.on('clientId',function(data){
+		alert(data);
+	});
+
+	var img = new Image(); //create a new img
+	img.src = "client/img/square.png"; //set its src to the img defined (contains an empty circle)
+	img.width = '91'; //set its width and height
+	img.height = '73';
+	img.border = "0"; //set its border to 0 so all images should be touching
+	img.id = 1;
+	document.body.appendChild(img); //add img to the document body
+
+
+	img.onclick = function change(){
+		//var img1 = document.getElementById(img);
+		socket.emit('current_index',img.id);
+	}
+
+	socket.on('newPosition',function(index){
+		socket.on('colour',function(colour){
+			if (colour === 'Y'){
+				img.id = index;
+				img.src = "client/img/squarefillY.png";
+			}else{
+				img.id = index;
+				img.src = "client/img/squarefillR.png";
+			};
+		});
+	});
+	</script>
+</body>
+</html>
