@@ -1,0 +1,16 @@
+{
+  "name": "nodeTesting",
+  "version": "0.0.1",
+  "author": "kaspy",
+  "dependencies": {
+    "body-parser": "latest",
+    "cookie-parser": "latest",
+    "express": "latest",
+    "express-session": "^1.15.2",
+    "mysql": "latest",
+    "nodemailer": "^4.0.1",
+    "pug": "latest",
+    "socket.io": "latest",
+    "xoauth2": "latest"
+  }
+}
